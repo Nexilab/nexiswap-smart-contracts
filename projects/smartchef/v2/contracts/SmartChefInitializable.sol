@@ -40,14 +40,14 @@ contract SmartChefInitializable is Ownable, ReentrancyGuard {
     // Block numbers available for user limit (after start block)
     uint256 public numberBlocksForUserLimit;
 
-    // Pancake profile
-    IPancakeProfile public immutable pancakeProfile;
+    // NexiSwap profile
+    IPancakeProfile public immutable nexiSwapProfile;
 
-    // Pancake Profile is requested
-    bool public pancakeProfileIsRequested;
+    // NexiSwap Profile is requested
+    bool public nexiSwapProfileIsRequested;
 
-    // Pancake Profile points threshold
-    uint256 public pancakeProfileThresholdPoints;
+    // NexiSwap Profile points threshold
+    uint256 public nexiSwapProfileThresholdPoints;
 
     // CAKE tokens created per block.
     uint256 public rewardPerBlock;
@@ -81,26 +81,26 @@ contract SmartChefInitializable is Ownable, ReentrancyGuard {
 
     /**
      * @notice Constructor
-     * @param _pancakeProfile: Pancake Profile address
-     * @param _pancakeProfileIsRequested: Pancake Profile is requested
-     * @param _pancakeProfileThresholdPoints: Pancake Profile need threshold points
+     * @param _nexiSwapProfile: NexiSwap Profile address
+     * @param _nexiSwapProfileIsRequested: NexiSwap Profile is requested
+     * @param _nexiSwapProfileThresholdPoints: NexiSwap Profile need threshold points
      */
     constructor(
-        address _pancakeProfile,
-        bool _pancakeProfileIsRequested,
-        uint256 _pancakeProfileThresholdPoints
+        address _nexiSwapProfile,
+        bool _nexiSwapProfileIsRequested,
+        uint256 _nexiSwapProfileThresholdPoints
     ) {
         SMART_CHEF_FACTORY = msg.sender;
 
         // Call to verify the address is correct
-        IPancakeProfile(_pancakeProfile).getTeamProfile(1);
-        pancakeProfile = IPancakeProfile(_pancakeProfile);
+        IPancakeProfile(_nexiSwapProfile).getTeamProfile(1);
+        nexiSwapProfile = IPancakeProfile(_nexiSwapProfile);
 
-        // if pancakeProfile is requested
-        pancakeProfileIsRequested = _pancakeProfileIsRequested;
+        // if nexiSwapProfile is requested
+        nexiSwapProfileIsRequested = _nexiSwapProfileIsRequested;
 
-        // pancakeProfile threshold points when profile & points are requested
-        pancakeProfileThresholdPoints = _pancakeProfileThresholdPoints;
+        // nexiSwapProfile threshold points when profile & points are requested
+        nexiSwapProfileThresholdPoints = _nexiSwapProfileThresholdPoints;
     }
 
     /*
@@ -163,19 +163,19 @@ contract SmartChefInitializable is Ownable, ReentrancyGuard {
 
         // Checks whether the user has an active profile
         require(
-            (!pancakeProfileIsRequested && pancakeProfileThresholdPoints == 0) ||
-                pancakeProfile.getUserStatus(msg.sender),
+            (!nexiSwapProfileIsRequested && nexiSwapProfileThresholdPoints == 0) ||
+                nexiSwapProfile.getUserStatus(msg.sender),
             "Deposit: Must have an active profile"
         );
 
         uint256 numberUserPoints = 0;
 
-        if (pancakeProfileThresholdPoints > 0) {
-            (, numberUserPoints, , , , ) = pancakeProfile.getUserProfile(msg.sender);
+        if (nexiSwapProfileThresholdPoints > 0) {
+            (, numberUserPoints, , , , ) = nexiSwapProfile.getUserProfile(msg.sender);
         }
 
         require(
-            pancakeProfileThresholdPoints == 0 || numberUserPoints >= pancakeProfileThresholdPoints,
+            nexiSwapProfileThresholdPoints == 0 || numberUserPoints >= nexiSwapProfileThresholdPoints,
             "Deposit: User is not get enough user points"
         );
 
@@ -338,8 +338,8 @@ contract SmartChefInitializable is Ownable, ReentrancyGuard {
         onlyOwner
     {
         require(_thresholdPoints >= 0, "Threshold points need to exceed 0");
-        pancakeProfileIsRequested = _isRequested;
-        pancakeProfileThresholdPoints = _thresholdPoints;
+        nexiSwapProfileIsRequested = _isRequested;
+        nexiSwapProfileThresholdPoints = _thresholdPoints;
         emit UpdateProfileAndThresholdPointsRequirement(_isRequested, _thresholdPoints);
     }
 

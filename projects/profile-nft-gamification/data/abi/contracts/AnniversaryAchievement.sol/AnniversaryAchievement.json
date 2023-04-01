@@ -3,7 +3,7 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "_pancakeProfile",
+        "name": "_nexiSwapProfile",
         "type": "address"
       },
       {
@@ -237,7 +237,7 @@
   },
   {
     "inputs": [],
-    "name": "pancakeProfile",
+    "name": "nexiSwapProfile",
     "outputs": [
       {
         "internalType": "contract PancakeProfile",

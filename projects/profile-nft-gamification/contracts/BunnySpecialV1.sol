@@ -18,7 +18,7 @@ contract BunnySpecialV1 is Ownable {
     using SafeMath for uint256;
 
     BunnyMintingStation public bunnyMintingStation;
-    PancakeProfile public pancakeProfile;
+    PancakeProfile public nexiSwapProfile;
 
     IBEP20 public cakeToken;
 
@@ -54,12 +54,12 @@ contract BunnySpecialV1 is Ownable {
     constructor(
         BunnyMintingStation _bunnyMintingStation,
         IBEP20 _cakeToken,
-        PancakeProfile _pancakeProfile,
+        PancakeProfile _nexiSwapProfile,
         uint256 _maxViewLength
     ) public {
         bunnyMintingStation = _bunnyMintingStation;
         cakeToken = _cakeToken;
-        pancakeProfile = _pancakeProfile;
+        nexiSwapProfile = _nexiSwapProfile;
         maxViewLength = _maxViewLength;
     }
 
@@ -80,7 +80,7 @@ contract BunnySpecialV1 is Ownable {
         uint256 userId;
         bool isUserActive;
 
-        (userId, , , , , isUserActive) = pancakeProfile.getUserProfile(senderAddress);
+        (userId, , , , , isUserActive) = nexiSwapProfile.getUserProfile(senderAddress);
 
         require(userId < bunnyCharacteristics[_bunnyId].thresholdUser, "ERR_USER_NOT_ELIGIBLE");
 
@@ -152,13 +152,13 @@ contract BunnySpecialV1 is Ownable {
     }
 
     function canClaimSingle(address _userAddress, uint8 _bunnyId) external view returns (bool) {
-        if (!pancakeProfile.hasRegistered(_userAddress)) {
+        if (!nexiSwapProfile.hasRegistered(_userAddress)) {
             return false;
         } else {
             uint256 userId;
             bool userStatus;
 
-            (userId, , , , , userStatus) = pancakeProfile.getUserProfile(_userAddress);
+            (userId, , , , , userStatus) = nexiSwapProfile.getUserProfile(_userAddress);
 
             if (!userStatus) {
                 return false;
@@ -172,14 +172,14 @@ contract BunnySpecialV1 is Ownable {
     function canClaimMultiple(address _userAddress, uint8[] calldata _bunnyIds) external view returns (bool[] memory) {
         require(_bunnyIds.length <= maxViewLength, "ERR_LENGTH_VIEW");
 
-        if (!pancakeProfile.hasRegistered(_userAddress)) {
+        if (!nexiSwapProfile.hasRegistered(_userAddress)) {
             bool[] memory responses = new bool[](0);
             return responses;
         } else {
             uint256 userId;
             bool userStatus;
 
-            (userId, , , , , userStatus) = pancakeProfile.getUserProfile(_userAddress);
+            (userId, , , , , userStatus) = nexiSwapProfile.getUserProfile(_userAddress);
 
             if (!userStatus) {
                 bool[] memory responses = new bool[](0);

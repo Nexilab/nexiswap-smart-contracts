@@ -10,7 +10,7 @@ import "./interfaces/IPancakeProfile.sol";
  * for IFOs they participated in.
  */
 contract PointCenterIFO is Ownable {
-    IPancakeProfile pancakeProfile;
+    IPancakeProfile nexiSwapProfile;
 
     uint256 public maxViewLength;
 
@@ -30,8 +30,8 @@ contract PointCenterIFO is Ownable {
         uint256 numberPoints;
     }
 
-    constructor(address _pancakeProfileAddress, uint256 _maxViewLength) public {
-        pancakeProfile = IPancakeProfile(_pancakeProfileAddress);
+    constructor(address _nexiSwapProfileAddress, uint256 _maxViewLength) public {
+        nexiSwapProfile = IPancakeProfile(_nexiSwapProfileAddress);
         maxViewLength = _maxViewLength;
     }
 
@@ -45,7 +45,7 @@ contract PointCenterIFO is Ownable {
         require(!_users[senderAddress][_contractAddress], "has claimed for this IFO");
 
         // 3. Check if he is active
-        bool isUserActive = pancakeProfile.getUserStatus(senderAddress);
+        bool isUserActive = nexiSwapProfile.getUserStatus(senderAddress);
         require(isUserActive, "not active");
 
         // 4. Check if he can claim
@@ -64,7 +64,7 @@ contract PointCenterIFO is Ownable {
         _users[senderAddress][_contractAddress] = true;
 
         // 6. Increase user points of sender
-        pancakeProfile.increaseUserPoints(
+        nexiSwapProfile.increaseUserPoints(
             senderAddress,
             ifos[_contractAddress].numberPoints,
             ifos[_contractAddress].campaignId

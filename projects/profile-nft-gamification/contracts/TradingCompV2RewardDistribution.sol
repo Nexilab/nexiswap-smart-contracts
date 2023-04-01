@@ -23,7 +23,7 @@ contract TradingCompV2RewardDistribution is Ownable {
     IBEP20 public portoToken;
     IBEP20 public santosToken;
 
-    IPancakeProfile public pancakeProfile;
+    IPancakeProfile public nexiSwapProfile;
     TradingCompV2 public tradingCompV2;
 
     uint256 public constant numberTeams = 3;
@@ -67,7 +67,7 @@ contract TradingCompV2RewardDistribution is Ownable {
 
     /**
      * @notice It initializes the contract.
-     * @param _pancakeProfileAddress: PancakeProfile address
+     * @param _nexiSwapProfileAddress: PancakeProfile address
      * @param _bunnyStationAddress: BunnyMintingStation address
      * @param _cakeTokenAddress: the address of the CAKE token
      * @param _lazioTokenAddress: the address of the LAZIO fan token
@@ -76,7 +76,7 @@ contract TradingCompV2RewardDistribution is Ownable {
      * @param _tradingCompV2Address: the address of the TradingCompV2 fan token
      */
     constructor(
-        address _pancakeProfileAddress,
+        address _nexiSwapProfileAddress,
         address _bunnyStationAddress,
         address _cakeTokenAddress,
         address _lazioTokenAddress,
@@ -84,7 +84,7 @@ contract TradingCompV2RewardDistribution is Ownable {
         address _santosTokenAddress,
         address _tradingCompV2Address
     ) public {
-        pancakeProfile = IPancakeProfile(_pancakeProfileAddress);
+        nexiSwapProfile = IPancakeProfile(_nexiSwapProfileAddress);
         bunnyMintingStation = BunnyMintingStation(_bunnyStationAddress);
         cakeToken = IBEP20(_cakeTokenAddress);
         lazioToken = IBEP20(_lazioTokenAddress);
@@ -109,7 +109,7 @@ contract TradingCompV2RewardDistribution is Ownable {
         );
 
         uint256 userTeamId;
-        (, , userTeamId, , , ) = pancakeProfile.getUserProfile(senderAddress);
+        (, , userTeamId, , , ) = nexiSwapProfile.getUserProfile(senderAddress);
 
         require(hasUserRegistered, "NOT_REGISTERED");
         require(!userTradingStats[senderAddress].hasClaimed && !hasUserClaimed, "HAS_CLAIMED");
@@ -131,7 +131,7 @@ contract TradingCompV2RewardDistribution is Ownable {
         }
 
         // User collects points
-        pancakeProfile.increaseUserPoints(
+        nexiSwapProfile.increaseUserPoints(
             senderAddress,
             userRewards.pointUsers[userRewardGroup],
             userRewards.userCampaignId[userRewardGroup]
@@ -276,7 +276,7 @@ contract TradingCompV2RewardDistribution is Ownable {
         hasUserClaimed = hasUserClaimed || userTradingStats[_userAddress].hasClaimed;
 
         uint256 userTeamId;
-        (, , userTeamId, , , ) = pancakeProfile.getUserProfile(_userAddress);
+        (, , userTeamId, , , ) = nexiSwapProfile.getUserProfile(_userAddress);
 
         bool canClaimNFT;
         if ((userTeamId == winningTeamId) && (userRewardGroup > 0)) {

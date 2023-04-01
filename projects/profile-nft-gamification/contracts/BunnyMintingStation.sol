@@ -2,14 +2,14 @@
 pragma solidity ^0.6.0;
 
 import "@openzeppelin/contracts/access/AccessControl.sol";
-import "./PancakeBunnies.sol";
+import "./NexiSwapBunnies.sol";
 
 /** @title BunnyMintingStation.
  * @dev This contract allows different factories to mint
- * Pancake Collectibles/Bunnies.
+ * NexiSwap Collectibles/Bunnies.
  */
 contract BunnyMintingStation is AccessControl {
-    PancakeBunnies public pancakeBunnies;
+    NexiSwapBunnies public pancakeBunnies;
 
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
 

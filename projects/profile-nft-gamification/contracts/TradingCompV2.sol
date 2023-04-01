@@ -22,7 +22,7 @@ contract TradingCompV2 is Ownable {
     IBEP20 public portoToken;
     IBEP20 public santosToken;
 
-    IPancakeProfile public pancakeProfile;
+    IPancakeProfile public nexiSwapProfile;
 
     uint256 public constant numberTeams = 3;
 
@@ -69,7 +69,7 @@ contract TradingCompV2 is Ownable {
 
     /**
      * @notice It initializes the contract.
-     * @param _pancakeProfileAddress: PancakeProfile address
+     * @param _nexiSwapProfileAddress: PancakeProfile address
      * @param _bunnyStationAddress: BunnyMintingStation address
      * @param _cakeTokenAddress: the address of the CAKE token
      * @param _lazioTokenAddress: the address of the LAZIO fan token
@@ -78,7 +78,7 @@ contract TradingCompV2 is Ownable {
      * @param _competitionId: competition uniq id
      */
     constructor(
-        address _pancakeProfileAddress,
+        address _nexiSwapProfileAddress,
         address _bunnyStationAddress,
         address _cakeTokenAddress,
         address _lazioTokenAddress,
@@ -86,7 +86,7 @@ contract TradingCompV2 is Ownable {
         address _santosTokenAddress,
         uint256 _competitionId
     ) public {
-        pancakeProfile = IPancakeProfile(_pancakeProfileAddress);
+        nexiSwapProfile = IPancakeProfile(_nexiSwapProfileAddress);
         bunnyMintingStation = BunnyMintingStation(_bunnyStationAddress);
         cakeToken = IBEP20(_cakeTokenAddress);
         lazioToken = IBEP20(_lazioTokenAddress);
@@ -126,7 +126,7 @@ contract TradingCompV2 is Ownable {
         }
 
         // User collects points
-        pancakeProfile.increaseUserPoints(
+        nexiSwapProfile.increaseUserPoints(
             senderAddress,
             userRewards.pointUsers[userRewardGroup],
             userRewards.userCampaignId[userRewardGroup]
@@ -150,7 +150,7 @@ contract TradingCompV2 is Ownable {
         uint256 userTeamId;
         bool isUserActive;
 
-        (, , userTeamId, , , isUserActive) = pancakeProfile.getUserProfile(senderAddress);
+        (, , userTeamId, , , isUserActive) = nexiSwapProfile.getUserProfile(senderAddress);
 
         require(isUserActive, "NOT_ACTIVE");
 

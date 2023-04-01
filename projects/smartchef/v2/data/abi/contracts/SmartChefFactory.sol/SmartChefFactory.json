@@ -75,17 +75,17 @@
       },
       {
         "internalType": "address",
-        "name": "_pancakeProfile",
+        "name": "_nexiSwapProfile",
         "type": "address"
       },
       {
         "internalType": "bool",
-        "name": "_pancakeProfileIsRequested",
+        "name": "_nexiSwapProfileIsRequested",
         "type": "bool"
       },
       {
         "internalType": "uint256",
-        "name": "_pancakeProfileThresholdPoints",
+        "name": "_nexiSwapProfileThresholdPoints",
         "type": "uint256"
       },
       {

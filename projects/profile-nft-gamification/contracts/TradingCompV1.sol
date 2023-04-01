@@ -18,7 +18,7 @@ contract TradingCompV1 is Ownable {
 
     BunnyMintingStation public bunnyMintingStation;
     IBEP20 public cakeToken;
-    IPancakeProfile public pancakeProfile;
+    IPancakeProfile public nexiSwapProfile;
 
     uint256 public constant numberTeams = 3;
 
@@ -61,16 +61,16 @@ contract TradingCompV1 is Ownable {
 
     /**
      * @notice It initializes the contract.
-     * @param _pancakeProfileAddress: PancakeProfile address
+     * @param _nexiSwapProfileAddress: PancakeProfile address
      * @param _bunnyStationAddress: BunnyMintingStation address
      * @param _cakeTokenAddress: the address of the CAKE token
      */
     constructor(
-        address _pancakeProfileAddress,
+        address _nexiSwapProfileAddress,
         address _bunnyStationAddress,
         address _cakeTokenAddress
     ) public {
-        pancakeProfile = IPancakeProfile(_pancakeProfileAddress);
+        nexiSwapProfile = IPancakeProfile(_nexiSwapProfileAddress);
         bunnyMintingStation = BunnyMintingStation(_bunnyStationAddress);
         cakeToken = IBEP20(_cakeTokenAddress);
         currentStatus = CompetitionStatus.Registration;
@@ -103,7 +103,7 @@ contract TradingCompV1 is Ownable {
         }
 
         // User collects points
-        pancakeProfile.increaseUserPoints(
+        nexiSwapProfile.increaseUserPoints(
             senderAddress,
             userRewards.pointUsers[userRewardGroup],
             userRewards.userCampaignId[userRewardGroup]
@@ -127,7 +127,7 @@ contract TradingCompV1 is Ownable {
         uint256 userTeamId;
         bool isUserActive;
 
-        (, , userTeamId, , , isUserActive) = pancakeProfile.getUserProfile(senderAddress);
+        (, , userTeamId, , , isUserActive) = nexiSwapProfile.getUserProfile(senderAddress);
 
         require(isUserActive, "NOT_ACTIVE");
 

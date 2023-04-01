@@ -18,7 +18,7 @@ contract BunnySpecialV2 is Ownable {
     using SafeMath for uint256;
 
     BunnyMintingStation public bunnyMintingStation;
-    PancakeProfile public pancakeProfile;
+    PancakeProfile public nexiSwapProfile;
 
     IBEP20 public cakeToken;
 
@@ -47,13 +47,13 @@ contract BunnySpecialV2 is Ownable {
     constructor(
         BunnyMintingStation _bunnyMintingStation,
         IBEP20 _cakeToken,
-        PancakeProfile _pancakeProfile,
+        PancakeProfile _nexiSwapProfile,
         uint256 _thresholdUser,
         uint256 _endBlock
     ) public {
         bunnyMintingStation = _bunnyMintingStation;
         cakeToken = _cakeToken;
-        pancakeProfile = _pancakeProfile;
+        nexiSwapProfile = _nexiSwapProfile;
         thresholdUser = _thresholdUser;
         endBlock = _endBlock;
     }
@@ -74,7 +74,7 @@ contract BunnySpecialV2 is Ownable {
         uint256 userTeamId;
         bool isUserActive;
 
-        (userId, , userTeamId, , , isUserActive) = pancakeProfile.getUserProfile(senderAddress);
+        (userId, , userTeamId, , , isUserActive) = nexiSwapProfile.getUserProfile(senderAddress);
 
         require(userId < thresholdUser, "ERR_USER_NOT_ELIGIBLE");
         require(isUserActive, "ERR_USER_NOT_ACTIVE");
@@ -135,11 +135,11 @@ contract BunnySpecialV2 is Ownable {
         if (hasClaimed[_userAddress]) {
             return false;
         } else {
-            if (!pancakeProfile.getUserStatus(_userAddress)) {
+            if (!nexiSwapProfile.getUserStatus(_userAddress)) {
                 return false;
             } else {
                 uint256 userId;
-                (userId, , , , , ) = pancakeProfile.getUserProfile(_userAddress);
+                (userId, , , , , ) = nexiSwapProfile.getUserProfile(_userAddress);
 
                 if (userId < thresholdUser) {
                     return true;

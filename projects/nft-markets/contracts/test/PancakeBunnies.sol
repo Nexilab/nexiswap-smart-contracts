@@ -26,7 +26,7 @@ contract PancakeBunnies is ERC721, Ownable {
     // Map the bunnyName for a tokenId
     mapping(uint8 => string) private bunnyNames;
 
-    constructor() ERC721("Pancake Bunnies", "PB") {
+    constructor() ERC721("NexiSwap Bunnies", "NB") {
         //
     }
 

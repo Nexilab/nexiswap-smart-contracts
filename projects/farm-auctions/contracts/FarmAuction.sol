@@ -9,7 +9,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 /**
- * @title PancakeSwap Farms Auctions.
+ * @title NexiSwap Farms Auctions.
  * @notice Auctions for new Farms, including multiplier.
  */
 contract FarmAuction is Ownable, ReentrancyGuard {

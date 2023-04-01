@@ -18,7 +18,7 @@ contract BunnySpecialCakeVault is Ownable {
 
     BunnyMintingStation public bunnyMintingStation;
     CakeVault public cakeVault;
-    PancakeProfile public pancakeProfile;
+    PancakeProfile public nexiSwapProfile;
 
     uint8 public constant bunnyId = 16;
 
@@ -44,7 +44,7 @@ contract BunnySpecialCakeVault is Ownable {
     constructor(
         address _cakeVault,
         address _bunnyMintingStation,
-        address _pancakeProfile,
+        address _nexiSwapProfile,
         uint256 _endBlock,
         uint256 _thresholdTimestamp,
         uint256 _numberPoints,
@@ -53,7 +53,7 @@ contract BunnySpecialCakeVault is Ownable {
     ) public {
         cakeVault = CakeVault(_cakeVault);
         bunnyMintingStation = BunnyMintingStation(_bunnyMintingStation);
-        pancakeProfile = PancakeProfile(_pancakeProfile);
+        nexiSwapProfile = PancakeProfile(_nexiSwapProfile);
         endBlock = _endBlock;
         thresholdTimestamp = _thresholdTimestamp;
         numberPoints = _numberPoints;
@@ -72,7 +72,7 @@ contract BunnySpecialCakeVault is Ownable {
         require(!hasClaimed[msg.sender], "ERR_HAS_CLAIMED");
 
         bool isUserActive;
-        (, , , , , isUserActive) = pancakeProfile.getUserProfile(msg.sender);
+        (, , , , , isUserActive) = nexiSwapProfile.getUserProfile(msg.sender);
 
         require(isUserActive, "ERR_USER_NOT_ACTIVE");
 
@@ -88,7 +88,7 @@ contract BunnySpecialCakeVault is Ownable {
         uint256 tokenId = bunnyMintingStation.mintCollectible(msg.sender, tokenURI, bunnyId);
 
         // Increase point on PancakeSwap profile, for a given campaignId.
-        pancakeProfile.increaseUserPoints(msg.sender, numberPoints, campaignId);
+        nexiSwapProfile.increaseUserPoints(msg.sender, numberPoints, campaignId);
 
         emit BunnyMint(msg.sender, tokenId, bunnyId);
     }
@@ -147,7 +147,7 @@ contract BunnySpecialCakeVault is Ownable {
         if (hasClaimed[_userAddress]) {
             return false;
         } else {
-            if (!pancakeProfile.getUserStatus(_userAddress)) {
+            if (!nexiSwapProfile.getUserStatus(_userAddress)) {
                 return false;
             } else {
                 uint256 lastDepositedTime;

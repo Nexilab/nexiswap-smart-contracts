@@ -11,10 +11,10 @@ import {ERC721Enumerable} from "@openzeppelin/contracts/token/ERC721/extensions/
 import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
 
 /**
- * @title Pancake Squad
- * @notice PancakeSwap NFT collection
+ * @title NexiSwap Squad
+ * @notice NexiSwap NFT collection
  */
-contract PancakeSquad is ERC721Enumerable, Ownable {
+contract NexiSwapSquad is ERC721Enumerable, Ownable {
     using SafeERC20 for IERC20;
     using Strings for uint256;
 

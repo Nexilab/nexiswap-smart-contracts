@@ -24,7 +24,7 @@ contract TradingCompV3 is Ownable, ERC721Holder {
     IBEP20 public immutable moboxMisteryBoxToken;
     IERC721Enumerable public moboxAvatarNFTCollection;
 
-    IPancakeProfile public immutable pancakeProfile;
+    IPancakeProfile public immutable nexiSwapProfile;
 
     uint256 public constant numberTeams = 3;
 
@@ -71,7 +71,7 @@ contract TradingCompV3 is Ownable, ERC721Holder {
 
     /**
      * @notice It initializes the contract.
-     * @param _pancakeProfileAddress: PancakeProfile address
+     * @param _nexiSwapProfileAddress: PancakeProfile address
      * @param _bunnyStationAddress: BunnyMintingStation address
      * @param _cakeTokenAddress: the address of the CAKE token
      * @param _moboxTokenAddress: the address of the MOBOX token
@@ -79,14 +79,14 @@ contract TradingCompV3 is Ownable, ERC721Holder {
      * @param _competitionId: competition uniq id
      */
     constructor(
-        address _pancakeProfileAddress,
+        address _nexiSwapProfileAddress,
         address _bunnyStationAddress,
         address _cakeTokenAddress,
         address _moboxTokenAddress,
         address _moboxMisteryBoxTokenAddress,
         uint256 _competitionId
     ) public {
-        pancakeProfile = IPancakeProfile(_pancakeProfileAddress);
+        nexiSwapProfile = IPancakeProfile(_nexiSwapProfileAddress);
         bunnyMintingStation = BunnyMintingStation(_bunnyStationAddress);
         cakeToken = IBEP20(_cakeTokenAddress);
         moboxToken = IBEP20(_moboxTokenAddress);
@@ -115,7 +115,7 @@ contract TradingCompV3 is Ownable, ERC721Holder {
         uint256 registeredUserTeamId = userTradingStats[senderAddress].teamId;
         bool isUserActive;
         uint256 userTeamId;
-        (, , userTeamId, , , isUserActive) = pancakeProfile.getUserProfile(senderAddress);
+        (, , userTeamId, , , isUserActive) = nexiSwapProfile.getUserProfile(senderAddress);
 
         require(isUserActive, "NOT_ACTIVE");
         require(userTeamId == registeredUserTeamId, "USER_TEAM_HAS_CHANGED");
@@ -144,7 +144,7 @@ contract TradingCompV3 is Ownable, ERC721Holder {
         }
 
         // User collects points
-        pancakeProfile.increaseUserPoints(
+        nexiSwapProfile.increaseUserPoints(
             senderAddress,
             userRewards.pointUsers[userRewardGroup],
             userRewards.userCampaignId[userRewardGroup]
@@ -168,7 +168,7 @@ contract TradingCompV3 is Ownable, ERC721Holder {
         uint256 userTeamId;
         bool isUserActive;
 
-        (, , userTeamId, , , isUserActive) = pancakeProfile.getUserProfile(senderAddress);
+        (, , userTeamId, , , isUserActive) = nexiSwapProfile.getUserProfile(senderAddress);
 
         require(isUserActive, "NOT_ACTIVE");
 
@@ -355,7 +355,7 @@ contract TradingCompV3 is Ownable, ERC721Holder {
         )
     {
         bool isUserActive;
-        (, , , , , isUserActive) = pancakeProfile.getUserProfile(_userAddress);
+        (, , , , , isUserActive) = nexiSwapProfile.getUserProfile(_userAddress);
         UserStats memory userStats = userTradingStats[_userAddress];
         bool hasUserRegistered = userStats.hasRegistered;
         if ((currentStatus != CompetitionStatus.Claiming) && (currentStatus != CompetitionStatus.Over)) {

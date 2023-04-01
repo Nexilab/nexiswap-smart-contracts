@@ -12,7 +12,7 @@ contract BunnySpecialLottery is Ownable {
 
     IPancakeSwapLottery public pancakeSwapLottery;
     BunnyMintingStation public bunnyMintingStation;
-    PancakeProfile public pancakeProfile;
+    PancakeProfile public nexiSwapProfile;
 
     /*** Storage ***/
 
@@ -45,7 +45,7 @@ contract BunnySpecialLottery is Ownable {
     constructor(
         address _pancakeSwapLotteryAddress,
         address _bunnyMintingStationAddress,
-        address _pancakeProfileAddress,
+        address _nexiSwapProfileAddress,
         uint256 _endBlock,
         string memory _tokenURI1,
         string memory _tokenURI2,
@@ -61,7 +61,7 @@ contract BunnySpecialLottery is Ownable {
     ) public {
         pancakeSwapLottery = IPancakeSwapLottery(_pancakeSwapLotteryAddress);
         bunnyMintingStation = BunnyMintingStation(_bunnyMintingStationAddress);
-        pancakeProfile = PancakeProfile(_pancakeProfileAddress);
+        nexiSwapProfile = PancakeProfile(_nexiSwapProfileAddress);
 
         endBlock = _endBlock;
 
@@ -107,7 +107,7 @@ contract BunnySpecialLottery is Ownable {
         uint256 tokenId = bunnyMintingStation.mintCollectible(msg.sender, tokenURIs[_bunnyId], _bunnyId);
 
         // Increase point on PancakeSwap profile, for a given campaignId.
-        pancakeProfile.increaseUserPoints(msg.sender, numberPoints[_bunnyId], campaignIds[_bunnyId]);
+        nexiSwapProfile.increaseUserPoints(msg.sender, numberPoints[_bunnyId], campaignIds[_bunnyId]);
 
         emit BunnyMint(msg.sender, tokenId, _bunnyId);
     }
@@ -222,7 +222,7 @@ contract BunnySpecialLottery is Ownable {
         // Common requirements for being able to claim any NFT
         if (
             hasClaimed[_userAddress][_bunnyId] ||
-            !pancakeProfile.getUserStatus(_userAddress) ||
+            !nexiSwapProfile.getUserStatus(_userAddress) ||
             block.number >= endBlock ||
             _lotteryId < startLotteryRound ||
             _lotteryId > finalLotteryRound

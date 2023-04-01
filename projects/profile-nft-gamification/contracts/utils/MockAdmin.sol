@@ -9,8 +9,8 @@ import "../PancakeProfile.sol";
  * for PancakeProfile.
  */
 contract MockAdmin is Ownable {
-    PancakeProfile pancakeProfile;
-    address public pancakeProfileAddress;
+    PancakeProfile nexiSwapProfile;
+    address public nexiSwapProfileAddress;
 
     mapping(address => bool) public hasReceivedPoints;
 
@@ -20,9 +20,9 @@ contract MockAdmin is Ownable {
 
     uint256 public numberFreePoints;
 
-    constructor(address _pancakeProfileAddress) public {
-        pancakeProfileAddress = _pancakeProfileAddress;
-        pancakeProfile = PancakeProfile(pancakeProfileAddress);
+    constructor(address _nexiSwapProfileAddress) public {
+        nexiSwapProfileAddress = _nexiSwapProfileAddress;
+        nexiSwapProfile = PancakeProfile(nexiSwapProfileAddress);
         numberFreePoints = 88;
         campaignId1 = 711012101;
         campaignId2 = 811012101;
@@ -33,7 +33,7 @@ contract MockAdmin is Ownable {
      * @notice Increase number of team points. Only owner can call it.
      */
     function increaseTeamPointsPP(uint16 _teamId, uint256 _numberPoints) external onlyOwner {
-        pancakeProfile.increaseTeamPoints(_teamId, _numberPoints, campaignId3);
+        nexiSwapProfile.increaseTeamPoints(_teamId, _numberPoints, campaignId3);
     }
 
     /**
@@ -46,19 +46,19 @@ contract MockAdmin is Ownable {
         // Check if user is active
         bool isActive;
 
-        isActive = pancakeProfile.getUserStatus(_msgSender());
+        isActive = nexiSwapProfile.getUserStatus(_msgSender());
 
         require(isActive, "not active");
 
         // Increase the number of points
         hasReceivedPoints[_msgSender()] = true;
-        pancakeProfile.increaseUserPoints(_msgSender(), numberFreePoints, campaignId1);
+        nexiSwapProfile.increaseUserPoints(_msgSender(), numberFreePoints, campaignId1);
     }
 
     /**
      * @notice Increase number of points for multiple users. Only owner can call it.
      */
     function increaseUserPointsMultiplePP(address[] calldata _userAddresses, uint256 _numberPoints) external onlyOwner {
-        pancakeProfile.increaseUserPointsMultiple(_userAddresses, _numberPoints, campaignId2);
+        nexiSwapProfile.increaseUserPointsMultiple(_userAddresses, _numberPoints, campaignId2);
     }
 }

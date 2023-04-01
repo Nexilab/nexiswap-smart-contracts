@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity >=0.6.2;
 
-import "./IPancakeRouter01.sol";
+import "./INexiSwapRouter01.sol";
 
-interface IPancakeRouter02 is IPancakeRouter01 {
+interface INexiSwapRouter02 is INexiSwapRouter01 {
     function removeLiquidityETHSupportingFeeOnTransferTokens(
         address token,
         uint256 liquidity,

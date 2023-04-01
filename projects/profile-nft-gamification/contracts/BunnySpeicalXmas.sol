@@ -8,12 +8,12 @@ import "./BunnyMintingStation.sol";
 
 contract BunnySpecialXmas is Ownable {
     BunnyMintingStation public immutable bunnyMintingStation;
-    IPancakeProfile public immutable pancakeProfile;
+    INexiSwapProfile public immutable nexiSwapProfile;
 
     uint256 public endBlock; // End of the distribution
 
-    // Pancake Profile points threshold
-    uint256 public pancakeProfileThresholdPoints;
+    // NexiSwap Profile points threshold
+    uint256 public nexiSwapProfileThresholdPoints;
 
     uint8 public immutable nftId; // Nft can be minted
     string public tokenURI; // Nft token URI
@@ -28,21 +28,21 @@ contract BunnySpecialXmas is Ownable {
     /**
      * @notice It initializes the contract.
      * @param _bunnyMintingStationAddress: BunnyMintingStation address
-     * @param _pancakeProfileAddress: PancakeProfile address
-     * @param _pancakeProfileThresholdPoints: User points threshold for mint NFT
+     * @param _nexiSwapProfileAddress: PancakeProfile address
+     * @param _nexiSwapProfileThresholdPoints: User points threshold for mint NFT
      * @param _nftId: Nft can be minted
      * @param _endBlock: the end of the block
      */
     constructor(
         address _bunnyMintingStationAddress,
-        address _pancakeProfileAddress,
-        uint256 _pancakeProfileThresholdPoints,
+        address _nexiSwapProfileAddress,
+        uint256 _nexiSwapProfileThresholdPoints,
         uint8 _nftId,
         uint256 _endBlock
     ) public {
         bunnyMintingStation = BunnyMintingStation(_bunnyMintingStationAddress);
-        pancakeProfile = IPancakeProfile(_pancakeProfileAddress);
-        pancakeProfileThresholdPoints = _pancakeProfileThresholdPoints;
+        nexiSwapProfile = IPancakeProfile(_nexiSwapProfileAddress);
+        nexiSwapProfileThresholdPoints = _nexiSwapProfileThresholdPoints;
         nftId = _nftId;
         endBlock = _endBlock;
     }
@@ -61,7 +61,7 @@ contract BunnySpecialXmas is Ownable {
      * @dev Only callable by owner.
      */
     function updateThresholdPoints(uint256 _newThresholdPoints) external onlyOwner {
-        pancakeProfileThresholdPoints = _newThresholdPoints;
+        nexiSwapProfileThresholdPoints = _newThresholdPoints;
         emit NewPancakeProfileThresholdPoints(_newThresholdPoints);
     }
 
@@ -90,13 +90,13 @@ contract BunnySpecialXmas is Ownable {
      * @notice Check if user can claim NFT.
      */
     function canClaim(address _userAddress) public view returns (bool) {
-        (, uint256 numberUserPoints, , , , bool active) = pancakeProfile.getUserProfile(_userAddress);
+        (, uint256 numberUserPoints, , , , bool active) = nexiSwapProfile.getUserProfile(_userAddress);
         // If user is able to mint this NFT
         if (
             !hasClaimed[_userAddress] &&
             block.number < endBlock &&
             active &&
-            numberUserPoints >= pancakeProfileThresholdPoints
+            numberUserPoints >= nexiSwapProfileThresholdPoints
         ) {
             return true;
         }

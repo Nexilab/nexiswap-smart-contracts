@@ -6,35 +6,35 @@ import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import {ReentrancyGuard} from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
-import {IPancakePair} from "./interfaces/IPancakePair.sol";
-import {IPancakeRouter02} from "./interfaces/IPancakeRouter02.sol";
+import {INexiSwapPair} from "./interfaces/INexiSwapPair.sol";
+import {INexiSwapRouter02} from "./interfaces/INexiSwapRouter02.sol";
 import {IWETH} from "./interfaces/IWETH.sol";
 import {Babylonian} from "./libraries/Babylonian.sol";
 
 /*
  * @author Inspiration from the work of Zapper and Beefy.
- * Implemented and modified by PancakeSwap teams.
+ * Implemented and modified by NexiSwap teams.
  */
-contract PancakeZapV1 is Ownable, ReentrancyGuard {
+contract NexiSwapZapV1 is Ownable, ReentrancyGuard {
     using SafeERC20 for IERC20;
 
     // Interface for Wrapped BNB (WBNB)
     IWETH public WBNB;
 
-    // PancakeRouter interface
-    IPancakeRouter02 public pancakeRouter;
+    // NexiSwapRouter interface
+    INexiSwapRouter02 public nexiSwapRouter;
 
     // Maximum integer (used for managing allowance)
     uint256 public constant MAX_INT = 2**256 - 1;
 
-    // Minimum amount for a swap (derived from PancakeSwap)
+    // Minimum amount for a swap (derived from NexiSwap)
     uint256 public constant MINIMUM_AMOUNT = 1000;
 
     // Maximum reverse zap ratio (100 --> 1%, 1000 --> 0.1%)
     uint256 public maxZapReverseRatio;
 
-    // Address PancakeRouter
-    address private pancakeRouterAddress;
+    // Address NexiSwapRouter
+    address private nexiSwapRouterAddress;
 
     // Address Wrapped BNB (WBNB)
     address private WBNBAddress;
@@ -84,18 +84,18 @@ contract PancakeZapV1 is Ownable, ReentrancyGuard {
     /*
      * @notice Constructor
      * @param _WBNBAddress: address of the WBNB contract
-     * @param _pancakeRouter: address of the PancakeRouter
+     * @param _nexiSwapRouter: address of the NexiSwapRouter
      * @param _maxZapReverseRatio: maximum zap ratio
      */
     constructor(
         address _WBNBAddress,
-        address _pancakeRouter,
+        address _nexiSwapRouter,
         uint256 _maxZapReverseRatio
     ) {
         WBNBAddress = _WBNBAddress;
         WBNB = IWETH(_WBNBAddress);
-        pancakeRouterAddress = _pancakeRouter;
-        pancakeRouter = IPancakeRouter02(_pancakeRouter);
+        nexiSwapRouterAddress = _nexiSwapRouter;
+        nexiSwapRouter = INexiSwapRouter02(_nexiSwapRouter);
         maxZapReverseRatio = _maxZapReverseRatio;
     }
 
@@ -338,22 +338,22 @@ contract PancakeZapV1 is Ownable, ReentrancyGuard {
             address swapTokenOut
         )
     {
-        address token0 = IPancakePair(_lpToken).token0();
-        address token1 = IPancakePair(_lpToken).token1();
+        address token0 = INexiSwapPair(_lpToken).token0();
+        address token1 = INexiSwapPair(_lpToken).token1();
 
         require(_tokenToZap == token0 || _tokenToZap == token1, "Zap: Wrong tokens");
 
         // Convert to uint256 (from uint112)
-        (uint256 reserveA, uint256 reserveB, ) = IPancakePair(_lpToken).getReserves();
+        (uint256 reserveA, uint256 reserveB, ) = INexiSwapPair(_lpToken).getReserves();
 
         if (token0 == _tokenToZap) {
             swapTokenOut = token1;
             swapAmountIn = _calculateAmountToSwap(_tokenAmountIn, reserveA, reserveB);
-            swapAmountOut = pancakeRouter.getAmountOut(swapAmountIn, reserveA, reserveB);
+            swapAmountOut = nexiSwapRouter.getAmountOut(swapAmountIn, reserveA, reserveB);
         } else {
             swapTokenOut = token0;
             swapAmountIn = _calculateAmountToSwap(_tokenAmountIn, reserveB, reserveA);
-            swapAmountOut = pancakeRouter.getAmountOut(swapAmountIn, reserveB, reserveA);
+            swapAmountOut = nexiSwapRouter.getAmountOut(swapAmountIn, reserveB, reserveA);
         }
 
         return (swapAmountIn, swapAmountOut, swapTokenOut);
@@ -387,20 +387,20 @@ contract PancakeZapV1 is Ownable, ReentrancyGuard {
         )
     {
         require(
-            _token0ToZap == IPancakePair(_lpToken).token0() || _token0ToZap == IPancakePair(_lpToken).token1(),
+            _token0ToZap == INexiSwapPair(_lpToken).token0() || _token0ToZap == INexiSwapPair(_lpToken).token1(),
             "Zap: Wrong token0"
         );
         require(
-            _token1ToZap == IPancakePair(_lpToken).token0() || _token1ToZap == IPancakePair(_lpToken).token1(),
+            _token1ToZap == INexiSwapPair(_lpToken).token0() || _token1ToZap == INexiSwapPair(_lpToken).token1(),
             "Zap: Wrong token1"
         );
 
         require(_token0ToZap != _token1ToZap, "Zap: Same tokens");
 
         // Convert to uint256 (from uint112)
-        (uint256 reserveA, uint256 reserveB, ) = IPancakePair(_lpToken).getReserves();
+        (uint256 reserveA, uint256 reserveB, ) = INexiSwapPair(_lpToken).getReserves();
 
-        if (_token0ToZap == IPancakePair(_lpToken).token0()) {
+        if (_token0ToZap == INexiSwapPair(_lpToken).token0()) {
             sellToken0 = (_token0AmountIn * reserveB > _token1AmountIn * reserveA) ? true : false;
 
             // Calculate the amount that is expected to be swapped
@@ -414,9 +414,9 @@ contract PancakeZapV1 is Ownable, ReentrancyGuard {
 
             // Calculate the amount expected to be received in the intermediary swap
             if (sellToken0) {
-                swapAmountOut = pancakeRouter.getAmountOut(swapAmountIn, reserveA, reserveB);
+                swapAmountOut = nexiSwapRouter.getAmountOut(swapAmountIn, reserveA, reserveB);
             } else {
-                swapAmountOut = pancakeRouter.getAmountOut(swapAmountIn, reserveB, reserveA);
+                swapAmountOut = nexiSwapRouter.getAmountOut(swapAmountIn, reserveB, reserveA);
             }
         } else {
             sellToken0 = (_token0AmountIn * reserveA > _token1AmountIn * reserveB) ? true : false;
@@ -431,9 +431,9 @@ contract PancakeZapV1 is Ownable, ReentrancyGuard {
 
             // Calculate the amount expected to be received in the intermediary swap
             if (sellToken0) {
-                swapAmountOut = pancakeRouter.getAmountOut(swapAmountIn, reserveB, reserveA);
+                swapAmountOut = nexiSwapRouter.getAmountOut(swapAmountIn, reserveB, reserveA);
             } else {
-                swapAmountOut = pancakeRouter.getAmountOut(swapAmountIn, reserveA, reserveB);
+                swapAmountOut = nexiSwapRouter.getAmountOut(swapAmountIn, reserveA, reserveB);
             }
         }
 
@@ -463,28 +463,28 @@ contract PancakeZapV1 is Ownable, ReentrancyGuard {
             address swapTokenOut
         )
     {
-        address token0 = IPancakePair(_lpToken).token0();
-        address token1 = IPancakePair(_lpToken).token1();
+        address token0 = INexiSwapPair(_lpToken).token0();
+        address token1 = INexiSwapPair(_lpToken).token1();
 
         require(_tokenToReceive == token0 || _tokenToReceive == token1, "Zap: Token not in LP");
 
         // Convert to uint256 (from uint112)
-        (uint256 reserveA, uint256 reserveB, ) = IPancakePair(_lpToken).getReserves();
+        (uint256 reserveA, uint256 reserveB, ) = INexiSwapPair(_lpToken).getReserves();
 
         if (token1 == _tokenToReceive) {
             // sell token0
-            uint256 tokenAmountIn = (_lpTokenAmount * reserveA) / IPancakePair(_lpToken).totalSupply();
+            uint256 tokenAmountIn = (_lpTokenAmount * reserveA) / INexiSwapPair(_lpToken).totalSupply();
 
             swapAmountIn = _calculateAmountToSwap(tokenAmountIn, reserveA, reserveB);
-            swapAmountOut = pancakeRouter.getAmountOut(swapAmountIn, reserveA, reserveB);
+            swapAmountOut = nexiSwapRouter.getAmountOut(swapAmountIn, reserveA, reserveB);
 
             swapTokenOut = token0;
         } else {
             // sell token1
-            uint256 tokenAmountIn = (_lpTokenAmount * reserveB) / IPancakePair(_lpToken).totalSupply();
+            uint256 tokenAmountIn = (_lpTokenAmount * reserveB) / INexiSwapPair(_lpToken).totalSupply();
 
             swapAmountIn = _calculateAmountToSwap(tokenAmountIn, reserveB, reserveA);
-            swapAmountOut = pancakeRouter.getAmountOut(swapAmountIn, reserveB, reserveA);
+            swapAmountOut = nexiSwapRouter.getAmountOut(swapAmountIn, reserveB, reserveA);
 
             swapTokenOut = token1;
         }
@@ -507,8 +507,8 @@ contract PancakeZapV1 is Ownable, ReentrancyGuard {
     ) internal returns (uint256 lpTokenReceived) {
         require(_tokenAmountIn >= MINIMUM_AMOUNT, "Zap: Amount too low");
 
-        address token0 = IPancakePair(_lpToken).token0();
-        address token1 = IPancakePair(_lpToken).token1();
+        address token0 = INexiSwapPair(_lpToken).token0();
+        address token1 = INexiSwapPair(_lpToken).token1();
 
         require(_tokenToZap == token0 || _tokenToZap == token1, "Zap: Wrong tokens");
 
@@ -521,7 +521,7 @@ contract PancakeZapV1 is Ownable, ReentrancyGuard {
 
         {
             // Convert to uint256 (from uint112)
-            (uint256 reserveA, uint256 reserveB, ) = IPancakePair(_lpToken).getReserves();
+            (uint256 reserveA, uint256 reserveB, ) = INexiSwapPair(_lpToken).getReserves();
 
             require((reserveA >= MINIMUM_AMOUNT) && (reserveB >= MINIMUM_AMOUNT), "Zap: Reserves too low");
 
@@ -539,7 +539,7 @@ contract PancakeZapV1 is Ownable, ReentrancyGuard {
         // Approve token to zap if necessary
         _approveTokenIfNeeded(_tokenToZap);
 
-        uint256[] memory swapedAmounts = pancakeRouter.swapExactTokensForTokens(
+        uint256[] memory swapedAmounts = nexiSwapRouter.swapExactTokensForTokens(
             swapAmountIn,
             _tokenAmountOutMin,
             path,
@@ -555,7 +555,7 @@ contract PancakeZapV1 is Ownable, ReentrancyGuard {
         }
 
         // Add liquidity and retrieve the amount of LP received by the sender
-        (, , lpTokenReceived) = pancakeRouter.addLiquidity(
+        (, , lpTokenReceived) = nexiSwapRouter.addLiquidity(
             path[0],
             path[1],
             _tokenAmountIn - swapedAmounts[0],
@@ -591,11 +591,11 @@ contract PancakeZapV1 is Ownable, ReentrancyGuard {
         bool _isToken0Sold
     ) internal returns (uint256 lpTokenReceived) {
         require(
-            _token0ToZap == IPancakePair(_lpToken).token0() || _token0ToZap == IPancakePair(_lpToken).token1(),
+            _token0ToZap == INexiSwapPair(_lpToken).token0() || _token0ToZap == INexiSwapPair(_lpToken).token1(),
             "Zap: Wrong token0"
         );
         require(
-            _token1ToZap == IPancakePair(_lpToken).token0() || _token1ToZap == IPancakePair(_lpToken).token1(),
+            _token1ToZap == INexiSwapPair(_lpToken).token0() || _token1ToZap == INexiSwapPair(_lpToken).token1(),
             "Zap: Wrong token1"
         );
 
@@ -606,11 +606,11 @@ contract PancakeZapV1 is Ownable, ReentrancyGuard {
 
         {
             // Convert to uint256 (from uint112)
-            (uint256 reserveA, uint256 reserveB, ) = IPancakePair(_lpToken).getReserves();
+            (uint256 reserveA, uint256 reserveB, ) = INexiSwapPair(_lpToken).getReserves();
 
             require((reserveA >= MINIMUM_AMOUNT) && (reserveB >= MINIMUM_AMOUNT), "Zap: Reserves too low");
 
-            if (_token0ToZap == IPancakePair(_lpToken).token0()) {
+            if (_token0ToZap == INexiSwapPair(_lpToken).token0()) {
                 swapAmountIn = _calculateAmountToSwapForRebalancing(
                     _token0AmountIn,
                     _token1AmountIn,
@@ -648,7 +648,7 @@ contract PancakeZapV1 is Ownable, ReentrancyGuard {
         }
 
         // Execute the swap and retrieve quantity received
-        uint256[] memory swapedAmounts = pancakeRouter.swapExactTokensForTokens(
+        uint256[] memory swapedAmounts = nexiSwapRouter.swapExactTokensForTokens(
             swapAmountIn,
             _tokenAmountOutMin,
             path,
@@ -660,7 +660,7 @@ contract PancakeZapV1 is Ownable, ReentrancyGuard {
         if (_isToken0Sold) {
             _approveTokenIfNeeded(_token1ToZap);
 
-            (, , lpTokenReceived) = pancakeRouter.addLiquidity(
+            (, , lpTokenReceived) = nexiSwapRouter.addLiquidity(
                 path[0],
                 path[1],
                 (_token0AmountIn - swapedAmounts[0]),
@@ -672,7 +672,7 @@ contract PancakeZapV1 is Ownable, ReentrancyGuard {
             );
         } else {
             _approveTokenIfNeeded(_token0ToZap);
-            (, , lpTokenReceived) = pancakeRouter.addLiquidity(
+            (, , lpTokenReceived) = nexiSwapRouter.addLiquidity(
                 path[0],
                 path[1],
                 (_token1AmountIn - swapedAmounts[0]),
@@ -698,16 +698,16 @@ contract PancakeZapV1 is Ownable, ReentrancyGuard {
         address _tokenToReceive,
         uint256 _tokenAmountOutMin
     ) internal returns (uint256) {
-        address token0 = IPancakePair(_lpToken).token0();
-        address token1 = IPancakePair(_lpToken).token1();
+        address token0 = INexiSwapPair(_lpToken).token0();
+        address token1 = INexiSwapPair(_lpToken).token1();
 
         require(_tokenToReceive == token0 || _tokenToReceive == token1, "Zap: Token not in LP");
 
         // Burn all LP tokens to receive the two tokens to this address
-        (uint256 amount0, uint256 amount1) = IPancakePair(_lpToken).burn(address(this));
+        (uint256 amount0, uint256 amount1) = INexiSwapPair(_lpToken).burn(address(this));
 
-        require(amount0 >= MINIMUM_AMOUNT, "PancakeRouter: INSUFFICIENT_A_AMOUNT");
-        require(amount1 >= MINIMUM_AMOUNT, "PancakeRouter: INSUFFICIENT_B_AMOUNT");
+        require(amount0 >= MINIMUM_AMOUNT, "NexiSwapRouter: INSUFFICIENT_A_AMOUNT");
+        require(amount1 >= MINIMUM_AMOUNT, "NexiSwapRouter: INSUFFICIENT_B_AMOUNT");
 
         address[] memory path = new address[](2);
         path[1] = _tokenToReceive;
@@ -729,7 +729,7 @@ contract PancakeZapV1 is Ownable, ReentrancyGuard {
         }
 
         // Swap tokens
-        pancakeRouter.swapExactTokensForTokens(swapAmountIn, _tokenAmountOutMin, path, address(this), block.timestamp);
+        nexiSwapRouter.swapExactTokensForTokens(swapAmountIn, _tokenAmountOutMin, path, address(this), block.timestamp);
 
         // Return full balance for the token to receive by the sender
         return IERC20(_tokenToReceive).balanceOf(address(this));
@@ -740,9 +740,9 @@ contract PancakeZapV1 is Ownable, ReentrancyGuard {
      * @param _token: token address
      */
     function _approveTokenIfNeeded(address _token) private {
-        if (IERC20(_token).allowance(address(this), pancakeRouterAddress) < 1e24) {
+        if (IERC20(_token).allowance(address(this), nexiSwapRouterAddress) < 1e24) {
             // Re-approve
-            IERC20(_token).safeApprove(pancakeRouterAddress, MAX_INT);
+            IERC20(_token).safeApprove(nexiSwapRouterAddress, MAX_INT);
         }
     }
 
@@ -759,8 +759,8 @@ contract PancakeZapV1 is Ownable, ReentrancyGuard {
         uint256 _reserve1
     ) private view returns (uint256 amountToSwap) {
         uint256 halfToken0Amount = _token0AmountIn / 2;
-        uint256 nominator = pancakeRouter.getAmountOut(halfToken0Amount, _reserve0, _reserve1);
-        uint256 denominator = pancakeRouter.quote(
+        uint256 nominator = nexiSwapRouter.getAmountOut(halfToken0Amount, _reserve0, _reserve1);
+        uint256 denominator = nexiSwapRouter.quote(
             halfToken0Amount,
             _reserve0 + halfToken0Amount,
             _reserve1 - nominator
@@ -796,8 +796,8 @@ contract PancakeZapV1 is Ownable, ReentrancyGuard {
 
         if (sellToken0) {
             uint256 token0AmountToSell = (_token0AmountIn - (_token1AmountIn * _reserve0) / _reserve1) / 2;
-            uint256 nominator = pancakeRouter.getAmountOut(token0AmountToSell, _reserve0, _reserve1);
-            uint256 denominator = pancakeRouter.quote(
+            uint256 nominator = nexiSwapRouter.getAmountOut(token0AmountToSell, _reserve0, _reserve1);
+            uint256 denominator = nexiSwapRouter.quote(
                 token0AmountToSell,
                 _reserve0 + token0AmountToSell,
                 _reserve1 - nominator
@@ -815,9 +815,9 @@ contract PancakeZapV1 is Ownable, ReentrancyGuard {
                 Babylonian.sqrt((token0AmountToSell * token0AmountToSell * nominator) / denominator);
         } else {
             uint256 token1AmountToSell = (_token1AmountIn - (_token0AmountIn * _reserve1) / _reserve0) / 2;
-            uint256 nominator = pancakeRouter.getAmountOut(token1AmountToSell, _reserve1, _reserve0);
+            uint256 nominator = nexiSwapRouter.getAmountOut(token1AmountToSell, _reserve1, _reserve0);
 
-            uint256 denominator = pancakeRouter.quote(
+            uint256 denominator = nexiSwapRouter.quote(
                 token1AmountToSell,
                 _reserve1 + token1AmountToSell,
                 _reserve0 - nominator

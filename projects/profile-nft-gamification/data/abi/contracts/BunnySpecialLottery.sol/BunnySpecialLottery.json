@@ -13,7 +13,7 @@
       },
       {
         "internalType": "address",
-        "name": "_pancakeProfileAddress",
+        "name": "_nexiSwapProfileAddress",
         "type": "address"
       },
       {
@@ -522,7 +522,7 @@
   },
   {
     "inputs": [],
-    "name": "pancakeProfile",
+    "name": "nexiSwapProfile",
     "outputs": [
       {
         "internalType": "contract PancakeProfile",

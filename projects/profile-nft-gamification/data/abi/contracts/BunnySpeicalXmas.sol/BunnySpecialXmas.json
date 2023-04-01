@@ -8,12 +8,12 @@
       },
       {
         "internalType": "address",
-        "name": "_pancakeProfileAddress",
+        "name": "_nexiSwapProfileAddress",
         "type": "address"
       },
       {
         "internalType": "uint256",
-        "name": "_pancakeProfileThresholdPoints",
+        "name": "_nexiSwapProfileThresholdPoints",
         "type": "uint256"
       },
       {
@@ -212,7 +212,7 @@
   },
   {
     "inputs": [],
-    "name": "pancakeProfile",
+    "name": "nexiSwapProfile",
     "outputs": [
       {
         "internalType": "contract IPancakeProfile",
@@ -225,7 +225,7 @@
   },
   {
     "inputs": [],
-    "name": "pancakeProfileThresholdPoints",
+    "name": "nexiSwapProfileThresholdPoints",
     "outputs": [
       {
         "internalType": "uint256",

@@ -30,7 +30,7 @@ contract NFTSale is VRFConsumerBase, Ownable, ReentrancyGuard {
     }
 
     IERC20 public immutable cakeToken;
-    IPancakeProfile public immutable pancakeProfile;
+    IPancakeProfile public immutable nexiSwapProfile;
     PancakeSquad public immutable pancakeSquad;
 
     uint256 public immutable maxReserveSupply; // max supply that can be minted by contract owner
@@ -80,22 +80,22 @@ contract NFTSale is VRFConsumerBase, Ownable, ReentrancyGuard {
 
     /**
      * @notice Constructor
-     * @param _pancakeSquad: PancakeSquad address
+     * @param _pancakeSquad: NexiSwapSquad address
      * @param _maxReserveSupply: NFT max reserve for the premint by the owner
      * @param _pricePerTicket: price per ticket
      * @param _cakeToken: CAKE Token address
-     * @param _pancakeProfile: Pancake Profile address
+     * @param _nexiSwapProfile: NexiSwap Profile address
      * @param _vrfCoordinator: address of the VRF coordinator
      * @param _linkToken: address of the LINK token
      * @dev https://docs.chain.link/docs/vrf-contracts/
-     * @dev PancakeSquad must be deployed before.
+     * @dev NexiSwapSquad must be deployed before.
      */
     constructor(
         address _pancakeSquad,
         uint256 _maxReserveSupply,
         uint256 _pricePerTicket,
         address _cakeToken,
-        address _pancakeProfile,
+        address _nexiSwapProfile,
         address _operator,
         address _vrfCoordinator,
         address _linkToken
@@ -115,8 +115,8 @@ contract NFTSale is VRFConsumerBase, Ownable, ReentrancyGuard {
         cakeToken = IERC20(_cakeToken);
 
         // Call to verify the address is correct
-        IPancakeProfile(_pancakeProfile).getTeamProfile(1);
-        pancakeProfile = IPancakeProfile(_pancakeProfile);
+        IPancakeProfile(_nexiSwapProfile).getTeamProfile(1);
+        nexiSwapProfile = IPancakeProfile(_nexiSwapProfile);
         operator = _operator;
     }
 
@@ -126,7 +126,7 @@ contract NFTSale is VRFConsumerBase, Ownable, ReentrancyGuard {
      */
     function buyTickets(uint256 _numberTickets) external nonReentrant {
         require(currentStatus == Status.Sale, "Status: Must be in sale");
-        require(pancakeProfile.getUserStatus(msg.sender), "Tickets: User is not eligible");
+        require(nexiSwapProfile.getUserStatus(msg.sender), "Tickets: User is not eligible");
         require(block.timestamp >= startTimestamp, "Tickets: Too early to buy");
         require(_numberTickets != 0, "Tickets: Cannot buy zero");
         require(_numberTickets <= maxPerTransaction, "Tickets: Max supply per batch reached");

@@ -23,9 +23,9 @@ contract SmartChefFactory is Ownable {
      * @param _endBlock: end block
      * @param _poolLimitPerUser: pool limit per user in stakedToken (if any, else 0)
      * @param _numberBlocksForUserLimit: block numbers available for user limit (after start block)
-     * @param _pancakeProfile: Pancake Profile address
-     * @param _pancakeProfileIsRequested: Pancake Profile is requested
-     * @param _pancakeProfileThresholdPoints: Pancake Profile need threshold points
+     * @param _nexiSwapProfile: NexiSwap Profile address
+     * @param _nexiSwapProfileIsRequested: NexiSwap Profile is requested
+     * @param _nexiSwapProfileThresholdPoints: NexiSwap Profile need threshold points
      * @param _admin: admin address with ownership
      * @return address of new smart chef contract
      */
@@ -37,9 +37,9 @@ contract SmartChefFactory is Ownable {
         uint256 _bonusEndBlock,
         uint256 _poolLimitPerUser,
         uint256 _numberBlocksForUserLimit,
-        address _pancakeProfile,
-        bool _pancakeProfileIsRequested,
-        uint256 _pancakeProfileThresholdPoints,
+        address _nexiSwapProfile,
+        bool _nexiSwapProfileIsRequested,
+        uint256 _nexiSwapProfileThresholdPoints,
         address _admin
     ) external onlyOwner {
         require(_stakedToken.totalSupply() >= 0);
@@ -50,7 +50,7 @@ contract SmartChefFactory is Ownable {
         // pass constructor argument
         bytecode = abi.encodePacked(
             bytecode,
-            abi.encode(_pancakeProfile, _pancakeProfileIsRequested, _pancakeProfileThresholdPoints)
+            abi.encode(_nexiSwapProfile, _nexiSwapProfileIsRequested, _nexiSwapProfileThresholdPoints)
         );
         bytes32 salt = keccak256(abi.encodePacked(_stakedToken, _rewardToken, _startBlock));
         address smartChefAddress;

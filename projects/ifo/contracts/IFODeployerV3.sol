@@ -15,17 +15,17 @@ contract IFODeployerV3 is Ownable {
 
     uint256 public constant MAX_BUFFER_BLOCKS = 200000; // 200,000 blocks (6-7 days on BSC)
 
-    address public immutable pancakeProfile;
+    address public immutable nexiSwapProfile;
 
     event AdminTokenRecovery(address indexed tokenRecovered, uint256 amount);
     event NewIFOContract(address indexed ifoAddress);
 
     /**
      * @notice Constructor
-     * @param _pancakeProfile: the address of the PancakeProfile
+     * @param _nexiSwapProfile: the address of the PancakeProfile
      */
-    constructor(address _pancakeProfile) public {
-        pancakeProfile = _pancakeProfile;
+    constructor(address _nexiSwapProfile) public {
+        nexiSwapProfile = _nexiSwapProfile;
     }
 
     /**
@@ -62,7 +62,7 @@ contract IFODeployerV3 is Ownable {
         IFOInitializableV3(ifoAddress).initialize(
             _lpToken,
             _offeringToken,
-            pancakeProfile,
+            nexiSwapProfile,
             _startBlock,
             _endBlock,
             MAX_BUFFER_BLOCKS,

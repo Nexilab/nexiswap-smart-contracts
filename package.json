@@ -1,13 +1,13 @@
 {
-  "name": "pancake-contracts",
+  "name": "nexiswap-contracts",
   "version": "1.0.0",
-  "description": "Pancake contracts",
+  "description": "NexiSwap contracts",
   "private": true,
   "workspaces": [
     "projects/**"
   ],
   "repository": "https://github.com/pancakeswap/pancake-contracts",
-  "author": "PancakeSwap",
+  "author": "NexiSwap",
   "license": "MIT",
   "scripts": {
     "format:check": "prettier --check 'projects/**/*.{js,ts,sol}'",
